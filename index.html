@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>餅つきするついでに月発展</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10162f;color:white;font-family:sans-serif;text-align:center}
+header{padding:18px 8px;background:#202950}
+h1{font-size:23px;margin:5px}
+#moon{font-size:65px;margin:12px}
+#rabbit{font-size:100px;border:0;background:transparent;touch-action:manipulation}
+#rabbit:active{transform:scale(.9)}
+.panel{background:#242e52;border-radius:15px;margin:12px;padding:14px}
+button{font-size:17px;padding:12px;margin:5px;border:0;border-radius:12px;background:#ffe18b;color:#33264c;font-weight:bold}
+small{color:#cbd4ff}
+</style>
+</head>
+<body>
+<header>
+<h1>🐰 餅つきするついでに月発展 🌕</h1>
+<div>🪙 コイン：<b id="coins">0</b></div>
+</header>
+<div id="moon">🌕</div>
+<div class="panel">
+<p id="message">月で餅つき開始！ ウサギをタップ！</p>
+<button id="rabbit" aria-label="ウサギをタップ">🐰</button>
+<p>ついた餅：<b id="mochi">0</b> 個</p>
+<button id="sell">🍡 餅を売る</button>
+</div>
+<div class="panel">
+<h2>🌙 月の発展ショップ</h2>
+<p>買うと自動でコインが増えるで！</p>
+<button id="house">🏠 月の家（10🪙）</button>
+<p>家：<b id="houses">0</b> 軒</p>
+<button id="factory">🏭 餅工場（30🪙）</button>
+<p>工場：<b id="factories">0</b> 個</p>
+<button id="rocket">🚀 ロケット（100🪙）</button>
+<p>ロケット：<b id="rockets">0</b> 機</p>
+</div>
+<div class="panel">
+<small>ゲームは自動保存されるで！</small><br>
+<button id="reset">最初からやり直す</button>
+</div>
+<script>
+let coins=0,mochi=0,houses=0,factories=0,rockets=0;
+function update(){
+document.getElementById('coins').textContent=coins;
+document.getElementById('mochi').textContent=mochi;
+document.getElementById('houses').textContent=houses;
+document.getElementById('factories').textContent=factories;
+document.getElementById('rockets').textContent=rockets;
+localStorage.setItem('moonMochiSave',JSON.stringify({coins,mochi,houses,factories,rockets}));
+}
+function load(){
+try{
+let s=JSON.parse(localStorage.getItem('moonMochiSave'));
+if(s){coins=s.coins||0;mochi=s.mochi||0;houses=s.houses||0;factories=s.factories||0;rockets=s.rockets||0}
+}catch(e){}
+update();
+}
+document.getElementById('rabbit').onclick=()=>{
+mochi++;
+document.getElementById('message').textContent='ぺったん！ お餅ができた！';
+update();
+};
+document.getElementById('sell').onclick=()=>{
+if(mochi<1){document.getElementById('message').textContent='先にウサギをタップして餅を作ろう！';return}
+coins+=mochi*2;mochi=0;
+document.getElementById('message').textContent='餅を売った！ コインGET！';
+update();
+};
+function buy(cost,type){
+if(coins<cost){document.getElementById('message').textContent='コインが足りないで！ 餅を売ろう！';return}
+coins-=cost;
+if(type==='house')houses++;
+if(type==='factory')factories++;
+if(type==='rocket')rockets++;
+document.getElementById('message').textContent='月が発展したで！ 🎉';
+update();
+}
+document.getElementById('house').onclick=()=>buy(10,'house');
+document.getElementById('factory').onclick=()=>buy(30,'factory');
+document.getElementById('rocket').onclick=()=>buy(100,'rocket');
+document.getElementById('reset').onclick=()=>{
+if(confirm('セーブデータを消して最初から始める？')){
+coins=0;mochi=0;houses=0;factories=0;rockets=0;update();
+document.getElementById('message').textContent='新しい月の生活スタート！';
+}
+};
+setInterval(()=>{
+let income=houses+factories*3+rockets*10;
+if(income>0){coins+=income;update()}
+},5000);
+load();
+</script>
+</body>
+</html>
